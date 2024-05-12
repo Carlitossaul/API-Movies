@@ -84,5 +84,64 @@ namespace ApiPeliculas.Controllers
             return CreatedAtRoute("GetCategory", new { categoryId = category.Id },category);
         }
 
+
+        [HttpDelete("{categoryId:int}", Name = "DeleteCategory")]
+
+        [ProducesResponseType(201, Type = typeof(CategoryDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+        public IActionResult DeleteCategory(int categoryId)
+        {
+            
+            if (!_categoryRepo.ExistsCategory(categoryId))
+            {
+                return NotFound();
+            }
+
+            var category = _categoryRepo.GetCategory(categoryId); 
+            if (!_categoryRepo.DeleteCategory(category))
+            {
+                ModelState.AddModelError("", $"Something was wrong deleting {category.Name}");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
+
+
+        [HttpPatch("{categoryId:int}", Name= "UpdateCategory")]
+
+        [ProducesResponseType(201, Type = typeof(CategoryDto))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+        public IActionResult UpdateCategory(int categoryId, [FromBody] CategoryDto CategoryDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (CategoryDto == null || categoryId != CategoryDto.Id)
+            {
+                return BadRequest(ModelState);
+            }
+            if (_categoryRepo.ExistsCategory(CategoryDto.Name))
+            {
+                ModelState.AddModelError("", "Category already exists");
+                return StatusCode(404, ModelState);
+            }
+
+            var category = _mapper.Map<Category>(CategoryDto);
+            if (!_categoryRepo.UpdateCategory(category))
+            {
+                ModelState.AddModelError("", $"Something was wrong updating {category.Name}");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
+
+
     }
 }
