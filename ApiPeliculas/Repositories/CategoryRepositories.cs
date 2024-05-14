@@ -13,7 +13,7 @@ namespace ApiPeliculas.Repositories
         }
         public bool CreateCategory(Category category)
         {
-            category.CreateData = DateTime.Now;
+            category.CreatedDate = DateTime.Now;
             _db.Category.Add(category);
             return Save();
         }
@@ -53,7 +53,7 @@ namespace ApiPeliculas.Repositories
 
         public bool UpdateCategory(Category category)
         {
-            category.CreateData = DateTime.Now;
+            category.CreatedDate = DateTime.Now;
             _db.Category.Update(category);
             return Save();
         }

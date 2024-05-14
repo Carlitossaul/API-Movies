@@ -7,13 +7,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ApiPeliculas.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/categories")]
     [ApiController]
-    public class CategoryController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private readonly ICategoryRepositories _categoryRepo;
         private readonly IMapper _mapper;
-        public CategoryController(ICategoryRepositories categoryRepo, IMapper mapper)
+        public CategoriesController(ICategoryRepositories categoryRepo, IMapper mapper)
         {
             _categoryRepo = categoryRepo;
             _mapper = mapper;
