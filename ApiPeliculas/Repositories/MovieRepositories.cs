@@ -9,7 +9,7 @@ namespace ApiPeliculas.Repositories
         private readonly ApplicationDbContext _db;
         public MovieRepositories(ApplicationDbContext db)
         {
-                _db = db;
+            _db = db;
         }
         public bool CreateMovie(Movie movie)
         {
@@ -53,7 +53,12 @@ namespace ApiPeliculas.Repositories
 
         public ICollection<Movie> GetMoviesByName(string name)
         {
-            return _db.Movie.Where(movie => movie.Name.Contains(name, StringComparison.OrdinalIgnoreCase) || movie.Description.Contains(name, StringComparison.OrdinalIgnoreCase)).ToList();
+            IQueryable<Movie> query = _db.Movie;
+            if (!string.IsNullOrEmpty(name))
+            {
+                query = query.Where(movie => movie.Name.Contains(name) || movie.Description.Contains(name));
+            }
+            return query.ToList();
         }
 
         public bool Save()

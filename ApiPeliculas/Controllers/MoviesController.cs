@@ -2,7 +2,6 @@
 using ApiPeliculas.Models.Dtos;
 using ApiPeliculas.Repositories.IRepositories;
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiPeliculas.Controllers
@@ -48,7 +47,7 @@ namespace ApiPeliculas.Controllers
             {
                 return NotFound();
             }
-            var itemMovieDto = _mapper.Map<CategoryDto>(itemMovie);
+            var itemMovieDto = _mapper.Map<Movie>(itemMovie);
             return Ok(itemMovieDto);
         }
 
@@ -60,7 +59,7 @@ namespace ApiPeliculas.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public IActionResult CreateMovie([FromBody] MovieDto movieDto )
+        public IActionResult CreateMovie([FromBody] MovieDto movieDto)
         {
             if (!ModelState.IsValid)
             {
@@ -84,6 +83,101 @@ namespace ApiPeliculas.Controllers
             }
             return CreatedAtRoute("GetMovie", new { movieId = movie.Id }, movie);
         }
+
+
+        [HttpDelete("{movieId:int}", Name = "DeleteMovie")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+        public IActionResult DeleteMovie(int movieId)
+        {
+            if (!_movieRepo.ExistsMovie(movieId))
+            {
+                return NotFound();
+            }
+            var movie = _movieRepo.GetMovie(movieId);
+            if (!_movieRepo.DeleteMovie(movie))
+            {
+                ModelState.AddModelError("", $"Something was wrong deleting {movie.Name}");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+
+        }
+
+        [HttpPatch("{movieId:int}", Name = "UpdateMovie")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public IActionResult UpdateMovie(int movieId, [FromBody] MovieDto movieDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            if (movieDto == null || movieId != movieDto.Id)
+            {
+                return BadRequest(ModelState);
+            }
+            if (_movieRepo.ExistsMovie(movieDto.Name))
+            {
+                ModelState.AddModelError("", "Movie already exists");
+                return StatusCode(404, ModelState);
+            }
+
+            var movie = _mapper.Map<Movie>(movieDto);
+            if (!_movieRepo.UpdateMovie(movie))
+            {
+                ModelState.AddModelError("", $"Something was wrong updating {movie.Name}");
+                return StatusCode(500, ModelState);
+            }
+            return NoContent();
+        }
+
+        [HttpGet("GetMoviesByCategory/{categoryId:int}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+
+        public IActionResult GetMoviesByCategory(int categoryId)
+        {
+            var listMovies = _movieRepo.GetMoviesByCategory(categoryId);
+            if (listMovies == null)
+            {
+                return NotFound();
+            }
+            var listMoviesDto = new List<MovieDto>();
+            foreach (var list in listMovies)
+            {
+                listMoviesDto.Add(_mapper.Map<MovieDto>(list));
+            }
+            return Ok(listMoviesDto);
+        }
+
+        [HttpGet("GetMovieByName")]
+
+
+        public IActionResult GetMovieByName(string name)
+        {
+            try
+            {
+                var result = _movieRepo.GetMoviesByName(name.Trim());
+                if (result.Any())
+                {
+                    return Ok(result);
+                }
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, "Something went wrong");
+
+            }
+        }
+
 
     }
 }
