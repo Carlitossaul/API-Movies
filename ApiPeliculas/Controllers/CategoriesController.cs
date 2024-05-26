@@ -2,6 +2,7 @@
 using ApiPeliculas.Models.Dtos;
 using ApiPeliculas.Repositories.IRepositories;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,6 +20,7 @@ namespace ApiPeliculas.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -35,6 +37,8 @@ namespace ApiPeliculas.Controllers
             return Ok(listCategoriesDto);
         }
 
+
+        [AllowAnonymous]
         [HttpGet("{CategoryId:int}", Name = "GetCategory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -52,8 +56,9 @@ namespace ApiPeliculas.Controllers
             return Ok(itemCategoryDto);
         }
 
-        [HttpPost]
 
+        [Authorize(Roles = "admin")]
+        [HttpPost]
         [ProducesResponseType(201, Type = typeof(CategoryDto))]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -84,9 +89,8 @@ namespace ApiPeliculas.Controllers
             return CreatedAtRoute("GetCategory", new { categoryId = category.Id },category);
         }
 
-
+        [Authorize(Roles = "admin")]
         [HttpDelete("{categoryId:int}", Name = "DeleteCategory")]
-
         [ProducesResponseType(201, Type = typeof(CategoryDto))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -111,8 +115,8 @@ namespace ApiPeliculas.Controllers
         }
 
 
+        [Authorize(Roles = "admin")]
         [HttpPatch("{categoryId:int}", Name= "UpdateCategory")]
-
         [ProducesResponseType(201, Type = typeof(CategoryDto))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -2,12 +2,14 @@
 using ApiPeliculas.Models.Dtos;
 using ApiPeliculas.Repositories.IRepositories;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 
 namespace ApiPeliculas.Controllers
 {
+    
     [Route("api/users")]
     [ApiController]
     public class UsersController : ControllerBase
@@ -22,6 +24,9 @@ namespace ApiPeliculas.Controllers
             _mapper = mapper;
         }
 
+
+
+        [Authorize(Roles = "admin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -37,6 +42,9 @@ namespace ApiPeliculas.Controllers
             return Ok(listUsersDTO);
         }
 
+
+
+        [Authorize(Roles = "admin")]
         [HttpGet("{userId:int}", Name = "GetUser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -54,6 +62,8 @@ namespace ApiPeliculas.Controllers
             return Ok(itemUserDto);
         }
 
+
+        [AllowAnonymous]
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -84,6 +94,7 @@ namespace ApiPeliculas.Controllers
 
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -3,6 +3,8 @@ using ApiPeliculas.Models.Dtos;
 using ApiPeliculas.Repositories.IRepositories;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace ApiPeliculas.Controllers
 {
@@ -18,6 +20,7 @@ namespace ApiPeliculas.Controllers
             _mapper = mapper;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -34,6 +37,8 @@ namespace ApiPeliculas.Controllers
             return Ok(listMoviesDto);
         }
 
+
+        [AllowAnonymous]
         [HttpGet("{movieId:int}", Name = "GetMovie")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -51,14 +56,15 @@ namespace ApiPeliculas.Controllers
             return Ok(itemMovieDto);
         }
 
-        [HttpPost]
 
+        [Authorize(Roles = "admin")]
+        [HttpPost]
         [ProducesResponseType(201, Type = typeof(MovieDto))]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-
         public IActionResult CreateMovie([FromBody] MovieDto movieDto)
         {
             if (!ModelState.IsValid)
@@ -85,12 +91,13 @@ namespace ApiPeliculas.Controllers
         }
 
 
+        [Authorize(Roles = "admin")]
         [HttpDelete("{movieId:int}", Name = "DeleteMovie")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-
         public IActionResult DeleteMovie(int movieId)
         {
             if (!_movieRepo.ExistsMovie(movieId))
@@ -107,9 +114,11 @@ namespace ApiPeliculas.Controllers
 
         }
 
+        [Authorize(Roles = "admin")]
         [HttpPatch("{movieId:int}", Name = "UpdateMovie")]
         [ProducesResponseType(204)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public IActionResult UpdateMovie(int movieId, [FromBody] MovieDto movieDto)
         {
@@ -136,6 +145,8 @@ namespace ApiPeliculas.Controllers
             return NoContent();
         }
 
+
+        [AllowAnonymous]
         [HttpGet("GetMoviesByCategory/{categoryId:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -157,9 +168,8 @@ namespace ApiPeliculas.Controllers
             return Ok(listMoviesDto);
         }
 
+        [AllowAnonymous]
         [HttpGet("GetMovieByName")]
-
-
         public IActionResult GetMovieByName(string name)
         {
             try
