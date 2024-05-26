@@ -28,6 +28,7 @@ namespace ApiPeliculas.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpGet]
+        [ResponseCache(CacheProfileName = "TimeCache")]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
 
@@ -46,6 +47,7 @@ namespace ApiPeliculas.Controllers
 
         [Authorize(Roles = "admin")]
         [HttpGet("{userId:int}", Name = "GetUser")]
+        [ResponseCache(CacheProfileName = "TimeCache")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

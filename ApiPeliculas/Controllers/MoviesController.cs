@@ -22,6 +22,7 @@ namespace ApiPeliculas.Controllers
 
         [AllowAnonymous]
         [HttpGet]
+        [ResponseCache(CacheProfileName = "TimeCache")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult GetMovies()
@@ -40,6 +41,7 @@ namespace ApiPeliculas.Controllers
 
         [AllowAnonymous]
         [HttpGet("{movieId:int}", Name = "GetMovie")]
+        [ResponseCache(CacheProfileName = "TimeCache")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -148,6 +150,7 @@ namespace ApiPeliculas.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetMoviesByCategory/{categoryId:int}")]
+        [ResponseCache(CacheProfileName = "TimeCache")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -170,6 +173,7 @@ namespace ApiPeliculas.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetMovieByName")]
+        [ResponseCache(CacheProfileName = "TimeCache")]
         public IActionResult GetMovieByName(string name)
         {
             try
